@@ -15,7 +15,7 @@ def converter(i):
 def writer(i):
     print('тип переменной: {},\n содержание переменной - {}'.format(type(i), i))
     print('{}\n после онлайн конвертера \n тип переменной: {}\n содержание переменной - {}'
-          .format('...'*20,type(converter(i)), converter(i)))
+          .format('...'*20, type(converter(i)), converter(i)))
 
 
 def type_description(i):
