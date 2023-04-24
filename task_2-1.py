@@ -47,24 +47,15 @@ def get_data():
             #Формировние главного списка для хранения данных отчета
             row_data = [p, n, c, t]
             main_data.append(row_data)
-    #print(main_data)
     return main_data
 
 
-
-
-
 def write_to_csv(outfile):
-
-
     with open(outfile, 'w+', encoding='utf-8') as f:
         F_N_WRITER = csv.writer(f)
         for row in get_data():
             F_N_WRITER.writerow(row)
 
+
 write_to_csv('data_report.csv')
-
-
-
-
 
