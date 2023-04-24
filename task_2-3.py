@@ -9,4 +9,14 @@
 установить возможность работы с юникодом: allow_unicode = True;
 Реализовать считывание данных из созданного файла и проверить, совпадают ли они с исходными.
 """
+import yaml
 
+Dict_ex = {
+                "item": ["item", "предмет", "item3"],
+                "quantity": 5,
+                "other": {"object1": "5€",
+                            "object2": "8€"}
+            }
+
+with open('file.yaml', 'w', encoding='utf-8') as f:
+    yaml.dump(Dict_ex, f, allow_unicode=True)
