@@ -1,5 +1,9 @@
 ﻿from socket import *
 
+
+def create_presence_messages():
+    
+    pass
 def main():
     s = socket(AF_INET, SOCK_STREAM)
     s.connect(('localhost', 10000))
