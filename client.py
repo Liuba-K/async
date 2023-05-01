@@ -37,14 +37,16 @@ def answer_server(s):
             return response
         raise ValueError
     raise ValueError
+
+
 def process_message_server(message):
     #разобрать сообщение сервера;
     if message['response'] == 200:
         return '200: ОК'
     else:
         return message['error'], message['response']
-
     #могут быть и другие трехзначные response
+
 
 def main():
     #параметры командной строки скрипта client.py <addr> [<port>]:
@@ -63,10 +65,10 @@ def main():
     send_message(s, msg)
 
     answer = process_message_server(answer_server(s))
+
     print(answer)
 
     s.close()
-
 
 
 if __name__ == '__main__':
