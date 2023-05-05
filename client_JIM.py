@@ -34,7 +34,7 @@ def answer_server(s):
     encoded_response = s.recv(MAX_MSG_LEN * MAX_SYMBOL_LEN_IN_BYTES) #проверка на длину 640символов
 
     json_response = encoded_response.decode('utf-8')
-    print(f'response from server: {json_response}')
+    #print(f'response from server: {json_response}')
     if len(json_response) > MAX_MSG_LEN:
         raise ValueError(f"Message cannot be longer then {MAX_MSG_LEN} symbols")
 
@@ -53,7 +53,6 @@ def process_message_server(message):
         return message['error'], message['response']
 
     #могут быть и другие трехзначные response
-
 
 def main():
     #параметры командной строки скрипта client.py <addr> [<port>] (порт по :
@@ -74,10 +73,14 @@ def main():
 
     send_message(s, msg)
 
-    answer = process_message_server(answer_server(s))
+    #answer = process_message_server(answer_server(s))
 
+    try:
+        answer = process_message_server(answer_server(s))
+        print(answer)
+    except (ValueError, json.JSONDecodeError):
+        print('Не удалось декодировать сообщение сервера.')
     s.close()
-
 
 
 if __name__ == '__main__':

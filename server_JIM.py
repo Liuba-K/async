@@ -15,10 +15,7 @@ def accept_client_message(message):
 
 def read_message(s: socket):
     #получить ответ сервера
-    """
     encoded_response = s.recv(MAX_MSG_LEN * MAX_SYMBOL_LEN_IN_BYTES) #проверка на длину 640символов
-    """
-    encoded_response = s.recv(1024)
     json_response = encoded_response.decode('utf-8')
     print(f'response from server: {json_response}')
     if len(json_response) > MAX_MSG_LEN:
@@ -30,15 +27,19 @@ def read_message(s: socket):
         return response
     raise ValueError("")
 
+def send_message(client, msg):
+    #отправка ответа клиенту;
+    js_message = json.dumps(msg)
+    encoded_message = js_message.encode('utf-8')
+    client.send(encoded_message)
+    # отправляем в байтах и только первое..
+
 
 def main():
-
     s = socket(AF_INET, SOCK_STREAM)
-
     parser = argparse.ArgumentParser("port and address")
-    parser.add_argument('-p', nargs='?', default='7777')
+    parser.add_argument('-p', nargs='?', default='7777', type=int)
     parser.add_argument('-a', nargs='?', help='Input addr ', default='127.0.0.1')
-
     namespace = parser.parse_args(sys.argv[1:])
 
     s.bind((namespace.a, namespace.p)) #listen_address, listen_port
@@ -46,21 +47,25 @@ def main():
 
     while True:
         client, addr = s.accept()
-        print('Получаем запрос на соединение:', client)
-        #data = client.recv(1024)
+        print('Получаем запрос на соединение:', addr)
+        try:
 
-        #json.loads(data.decode('utf-8'))
-        #print('Было получено сообщение: ', json.loads(data.decode('utf-8')))
-        message_from_client = read_message(client)
-        print(message_from_client)
-        msg = accept_client_message()    #то, что видит клиент
-        client.send(json.dumps(msg).encode('utf-8')) #отправляем в байтах и только первое..
+            message_from_client = read_message(client)
+            print('Сообщение от клиента:', message_from_client)
 
-        client.close()
-
+            msg = accept_client_message(message_from_client)    #то, что видит клиент
+            #client.send(json.dumps(msg).encode('utf-8')) #отправляем в байтах и только первое..
+            send_message(client, msg)
+            client.close()
+        except (ValueError, json.JSONDecodeError):
+            print('Принято некорретное сообщение от клиента.')
+            client.close()
 
 if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        print('failed to start server') #traceback
+        print(e)
+
+
+
