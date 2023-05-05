@@ -17,7 +17,7 @@ def read_message(s: socket):
     #получить ответ сервера
     encoded_response = s.recv(MAX_MSG_LEN * MAX_SYMBOL_LEN_IN_BYTES) #проверка на длину 640символов
     json_response = encoded_response.decode('utf-8')
-    print(f'response from server: {json_response}')
+    #print(f'response from server: {json_response}')
     if len(json_response) > MAX_MSG_LEN:
         raise ValueError(f"Message cannot be longer then {MAX_MSG_LEN} symbols")
 
@@ -32,17 +32,19 @@ def send_message(client, msg):
     js_message = json.dumps(msg)
     encoded_message = js_message.encode('utf-8')
     client.send(encoded_message)
-    # отправляем в байтах и только первое..
 
 
 def main():
     s = socket(AF_INET, SOCK_STREAM)
-    parser = argparse.ArgumentParser("port and address")
-    parser.add_argument('-p', nargs='?', default='7777', type=int)
-    parser.add_argument('-a', nargs='?', help='Input addr ', default='127.0.0.1')
-    namespace = parser.parse_args(sys.argv[1:])
+    if len(sys.argv) > 1:
+        parser = argparse.ArgumentParser("port and address")
+        parser.add_argument('-p', nargs='?', default='7777', type=int)
+        parser.add_argument('-a', nargs='?', help='Input addr ', required=True)
+        namespace = parser.parse_args(sys.argv[1:])
 
-    s.bind((namespace.a, namespace.p)) #listen_address, listen_port
+        s.bind((namespace.a, namespace.p)) #listen_address, listen_port
+    else:
+        s.bind(('', 7777))#127.0.0.1
     s.listen(5)#подключается 5 клиентов
 
     while True:
@@ -60,6 +62,7 @@ def main():
         except (ValueError, json.JSONDecodeError):
             print('Принято некорретное сообщение от клиента.')
             client.close()
+
 
 if __name__ == '__main__':
     try:
