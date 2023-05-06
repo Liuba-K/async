@@ -33,18 +33,19 @@ def send_message(client, msg):
     encoded_message = js_message.encode('utf-8')
     client.send(encoded_message)
 
+def server_parser():
+    parser = argparse.ArgumentParser("port and address")
+    parser.add_argument('-p', nargs='?', default='7777', type=int)
+    parser.add_argument('-a', nargs='?', help='Input addr ', required=True, default='127.0.0.1')
+    namespace = parser.parse_args(sys.argv[1:])
+    return namespace
 
 def main():
     s = socket(AF_INET, SOCK_STREAM)
-    if len(sys.argv) > 1:
-        parser = argparse.ArgumentParser("port and address")
-        parser.add_argument('-p', nargs='?', default='7777', type=int)
-        parser.add_argument('-a', nargs='?', help='Input addr ', required=True)
-        namespace = parser.parse_args(sys.argv[1:])
 
-        s.bind((namespace.a, namespace.p)) #listen_address, listen_port
-    else:
-        s.bind(('', 7777))#127.0.0.1
+    namespace = server_parser()
+    s.bind((namespace.a, namespace.p)) #listen_address, listen_port
+
     s.listen(5)#подключается 5 клиентов
 
     while True:
