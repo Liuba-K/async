@@ -64,7 +64,7 @@ def main():
     else:
         addr = '127.0.0.1'
         port = 7777
-
+    print(f'{addr=} {port=}')
     s = socket(AF_INET, SOCK_STREAM)
     s.connect((addr, port)) ##127.0.0.1 7777
     msg = create_presence_messages()
