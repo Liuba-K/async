@@ -28,7 +28,7 @@ def mainloop():
         finally:
             recv_lst = []
             send_lst = []
-            err_lst = []
+            #err_lst = []
 
             #w = []
             try:
@@ -37,18 +37,14 @@ def mainloop():
             except Exception as e:
                 pass
             if recv_lst:
-                for client_with_message in recv_lst:
+                for s_client in recv_lst:
+                    timestr = time.ctime(time.time()) + '\n'
+                    try:
+                        s_client.send(timestr.encode('utf-8'))
+                    except:
+                        clients.remove(s_client)
 
-
-
-                """ 
-                            mes = input()
-                            if mes == 'r':
-                                client.set_read()
-                            elif mes == 'w':
-                                client.set_write()
-                                """
-                for s_client in w:
+                for s_client in send_lst:
                     timestr = time.ctime(time.time()) + '\n'
                     try:
                         s_client.send(timestr.encode('utf-8'))
