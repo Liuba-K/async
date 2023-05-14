@@ -38,8 +38,7 @@ def write_responses(requests, w_clients, all_clients):
                 sock.send(resp.upper())
             except:
                 # Сокет недоступен, клиент отключился
-                print('Клиент {} {} отключился'.format(sock.fileno(),
-                sock.getpeername()))
+                print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
                 sock.close()
                 all_clients.remove(sock)
 
