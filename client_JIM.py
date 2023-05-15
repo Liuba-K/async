@@ -1,6 +1,8 @@
 ﻿from socket import *
 import json
 import sys
+import threading
+import time
 
 
 MAX_MSG_LEN = 640
@@ -52,6 +54,53 @@ def process_message_server(message):
         return message['error'], message['response']
 
     #могут быть и другие трехзначные response
+def message_from_server(s):# username
+    """Функция - обработчик сообщений других пользователей, поступающих с сервера"""
+    while True:
+        try:
+            message = answer_server(s)
+            if message['action'] == 'message' and \
+                    "sender" in message and "destination" in message \
+                    and "text" in message:
+                print(f'\nПолучено сообщение от пользователя {message["sender" ]}:'
+                      f'\n{message["text"]}')
+            else:
+                print(f'Получено некорректное сообщение с сервера: {message}')
+        except(ConnectionRefusedError, ConnectionError):#проверить
+            print(f'Не удалось декодировать полученное сообщение.')
+
+def create_message(sock, account_name='Guest'):
+    """
+    Функция запрашивает кому отправить сообщение и само сообщение,
+    и отправляет полученные данные на сервер
+    :param sock:
+    :param account_name:
+    :return:
+    """
+    to_user = input('Введите получателя сообщения: ')
+    message = input('Введите сообщение для отправки: ')
+    message_dict = {
+        "action": 'message',##
+        "sender": account_name,
+        "destination": to_user,
+        "time": time.time(),
+        "text": message
+    }
+
+    try:
+        send_message(sock, message_dict)
+    except(ConnectionRefusedError, ConnectionError):#проверить
+        sys.exit(1)
+
+def user_interactive(sock): #username
+    """Функция взаимодействия с пользователем, запрашивает команды, отправляет сообщения"""
+
+    while True:
+        command = input('Введите команду: ')
+        if command == 'message':
+            create_message(sock)#, username
+        else:
+            print('Команда не распознана, попробойте снова.')
 
 def main():
     #параметры командной строки скрипта client.py <addr> [<port>] (порт по :
@@ -77,7 +126,20 @@ def main():
         print(answer)
     except (ValueError, json.JSONDecodeError):
         print('Не удалось декодировать сообщение сервера.')
-    s.close()
+    # запускаем клиенский процесс приёма сообщний
+    receiver = threading.Thread(target=message_from_server, args=(s, )) #'username'
+    receiver.daemon = True
+    receiver.start()
+    # затем запускаем отправку сообщений и взаимодействие с пользователем.
+    user_interface = threading.Thread(target=user_interactive, args=(s, ))#'username'
+    user_interface.daemon = True
+    user_interface.start()
+
+    while True:
+        time.sleep(1)
+        if receiver.is_alive() and user_interface.is_alive():
+            continue
+        break
 
 
 if __name__ == '__main__':
