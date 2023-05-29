@@ -8,7 +8,8 @@ import time
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4  # in utf-8 symbol could have len 1-4 in bytes
 
-
+class ClientVerifier:
+    pass
 def create_presence_messages():
     #сформировать presence-сообщение
     messenger = {

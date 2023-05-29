@@ -7,6 +7,9 @@ import argparse
 
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4
+
+class ServerVerifier:
+    pass
 def accept_client_message(message):
     #принимает сообщение клиента
     if message['action'] == 'presence' and 'time' in message:
