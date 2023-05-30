@@ -4,17 +4,34 @@ import time
 import json
 import sys
 import argparse
+import select #new
 
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4
-
+MAX_CONNECTIONS = 5 #подключается 5 клиентов
 class ServerVerifier:
     pass
-def accept_client_message(message):
+def accept_client_message(message,client, names):
     #принимает сообщение клиента
-    if message['action'] == 'presence' and 'time' in message:
-        return {'response': 200}
+    if message['action'] == 'presence' and 'time' in message and 'user' in message:
+        if message['user']['account_name'] not in names.keys():
+            names[message['user']['account_name']] = client
+            send_message(client, {'response': 200})
+        else:
+            response = {'response': 400, 'error': 'Bad Request'}
+            send_message(client, response)
+            client.close()
+        #return {'response': 200}
+        return
     return {'response': 400, 'error': 'Bad Request'} #необязательное поле
+def process_message(message, names, s):
+    #отправляет сообщение клиенту
+    if message['destination'] in names and names[message['destination']] in s:
+        send_message(names[message['destination']], message)
+    elif message['destination'] in names and names[message['destination']] not in s:
+        raise ConnectionError
+    else:
+        print(f'Отправка невозможна, пользователь не зарегистрирован')
 
 def read_message(s: socket):
     #получить ответ сервера
@@ -48,13 +65,28 @@ def main():
 
     namespace = server_parser()
     s.bind((namespace.a, namespace.p)) #listen_address, listen_port
+    s.settimeout(0.5)
+    clients = []
+    messages = []
+    names = dict()
 
-    s.listen(5)#подключается 5 клиентов
+    s.listen(MAX_CONNECTIONS)
 
     while True:
-        client, addr = s.accept()
-        print('Получаем запрос на соединение:', addr)
         try:
+            client, addr = s.accept()
+            print('Получаем запрос на соединение:', addr)
+        except OSError:
+            pass
+        recv_data_lst = []
+        send_data_lst = []
+        err_lst = []
+        # Проверяем на наличие ждущих клиентов
+        try:
+            if clients:
+                recv_data_lst, send_data_lst, err_lst = select.select(clients, clients, [], 0)
+        except OSError:
+            pass
 
             message_from_client = read_message(client)
             print('Сообщение от клиента:', message_from_client)

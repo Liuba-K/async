@@ -13,13 +13,13 @@ class ClientVerifier:
 def create_presence_messages():
     #сформировать presence-сообщение
     messenger = {
-       "action": "presence",
-       "time": 1682704782.6792958,
-       "user": {
-               "Имя":
-               "C0deMaver1ck",
-               "password":
-               "CorrectHorseBatteryStaple"
+       'action': 'presence',
+       'time': 1682704782.6792958,
+       'user': {
+               'Имя':
+               'C0deMaverck',
+               'password':
+               'CorrectHorseBatteryStaple'
                }
        }
     return messenger
@@ -61,8 +61,8 @@ def message_from_server(s):# username
         try:
             message = answer_server(s)
             if message['action'] == 'message' and \
-                    "sender" in message and "destination" in message \
-                    and "text" in message:
+                    'sender' in message and 'destination' in message \
+                    and 'text' in message:
                 print(f'\nПолучено сообщение от пользователя {message["sender" ]}:'
                       f'\n{message["text"]}')
             else:
