@@ -11,6 +11,7 @@ SERVER_DATABASE = "sqlite:///D:/IT/projects/async/server_db.db3"
  Для взаимодействия с БД можно применять ORM.
 """
 
+
 class ServerDb:
     class Users:
         def __init__(self, name, ip, port):
@@ -74,8 +75,53 @@ class ServerDb:
         print(username, ip_address, port)
             # Запрос в таблицу пользователей на наличие там пользователя с таким именем
         rez = self.session.query(self.Users).filter_by(name=username)
-        user = self.Users(login)#
+        user = self.Users(username) #
         self.session.add(user)
         self.session.commit()## Комит здесь нужен, чтобы присвоился ID
+        new_active_user = self.Users(user.id, ip_address, port, datetime.datetime.now()) #login_time
+        self.session.add(new_active_user)
+        # Создаем экземпляр класса self.LoginHistory, через который передаем данные в таблицу
+        history = self.ClientHistory(user.id, datetime.datetime.now(), ip_address, port)
+        self.session.add(history)
+
+        # Сохраняем изменения
+        self.session.commit()
+
+    def user_logout(self, username):
+        # Запрашиваем пользователя, что покидает нас
+        # получаем запись из таблицы Users
+        user = self.session.query(self.Users).filter_by(name=username).first()
+        print(user)
+
+        # Функция возвращающая историю входов по пользователю или всем пользователям
+    def login_history(self, username=None):
+            # Запрашиваем историю входа
+        query = self.session.query(self.Users.login,
+                                       self.ClientHistory.date_time,
+                                       self.ClientHistory.ip,
+                                       self.ClientHistory.port
+                                       ).join(self.Users)
+            # Если было указано имя пользователя, то фильтруем по нему
+        if username:
+            query = query.filter(self.Users.login == username)
+        return query.all()
+
+    # Отладка
+if __name__ == '__main__':
+    test_db = ServerDb()
+        # выполняем 'подключение' пользователя
+    test_db.user_login('client_1', '192.168.1.4', 8888)
+    test_db.user_login('client_2', '192.168.1.5', 7777)
+        # выводим список кортежей - активных пользователей
+    print(test_db.active_users_list())
+        # выполянем 'отключение' пользователя
+    test_db.user_logout('client_1')
+        # выводим список активных пользователей
+    print(test_db.active_users_list())
+        # запрашиваем историю входов по пользователю
+    test_db.login_history('client_1')
+        # выводим список известных пользователей
+    print(test_db.users_list())
+
 
 
