@@ -5,10 +5,12 @@ import json
 import sys
 import argparse
 import select #new
-
+import dis
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4
 MAX_CONNECTIONS = 5 #подключается 5 клиентов
+
+
 class ServerVerifier:
     pass
 def accept_client_message(message,client, names):

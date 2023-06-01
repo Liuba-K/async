@@ -3,13 +3,18 @@ import json
 import sys
 import threading
 import time
-
+import dis
 
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4  # in utf-8 symbol could have len 1-4 in bytes
 
 class ClientVerifier:
     pass
+class ClientSender(threading.Thread, metaclass=ClientMaker):
+    def __init__(self, account_name, sock):
+        self.account_name = account_name
+        self.sock = sock
+        super().__init__() #почему super, не основной
 def create_presence_messages():
     #сформировать presence-сообщение
     messenger = {
