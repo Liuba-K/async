@@ -3,7 +3,7 @@ import json
 import sys
 import threading
 import time
-
+from client_db import ClientDb
 
 MAX_MSG_LEN = 640
 MAX_SYMBOL_LEN_IN_BYTES = 4  # in utf-8 symbol could have len 1-4 in bytes
@@ -134,6 +134,22 @@ def main():
     user_interface = threading.Thread(target=user_interactive, args=(s, ))#'username'
     user_interface.daemon = True
     user_interface.start()
+
+
+    # Инициализация БД
+    database = ClientDb(client_name)
+    database_load(s, database, client_name)
+
+    # Если соединение с сервером установлено корректно, запускаем поток взаимодействия с пользователем
+    #module_sender = ClientSender(client_name, transport, database)
+    module_sender.daemon = True
+    module_sender.start()
+    #logger.debug('Запущены процессы')
+
+    # затем запускаем поток - приёмник сообщений.
+    module_receiver = ClientReader(client_name, s, database)
+    module_receiver.daemon = True
+    module_receiver.start()
 
     while True:
         time.sleep(1)

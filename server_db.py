@@ -1,7 +1,7 @@
 ﻿from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, ForeignKey, DateTime
 from sqlalchemy.orm import mapper, sessionmaker
 import datetime
-
+from server_db import ServerDb
 
 #SERVER_DATABASE = sqlite:///server_base.db3
 SERVER_DATABASE = "sqlite:///D:/IT/projects/async/server_db.db3"
