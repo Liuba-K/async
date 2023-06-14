@@ -10,7 +10,8 @@ MAX_SYMBOL_LEN_IN_BYTES = 4  # in utf-8 symbol could have len 1-4 in bytes
 
 class ClientVerifier:
     pass
-class ClientSender(threading.Thread, metaclass=ClientMaker):
+#, metaclass=ClientMaker)
+class ClientSender(threading.Thread):
     def __init__(self, account_name, sock):
         self.account_name = account_name
         self.sock = sock
